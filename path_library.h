@@ -1,12 +1,36 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
+#include <unordered_map>
 
 namespace PathLibrary {
   struct Node {
-    int x, y;
+    int x, y, value;
+
+    Node() = default;
+
+    Node(int a_x, int a_y, int a_value) {
+      x = a_x;
+      y = a_y;
+      value = a_value;
+    }
+
+    Node(const Node &obj) {
+      x = obj.x;
+      y = obj.y;
+      value = obj.value;
+    }
 
     bool operator ==(const Node &b) const {
       return x == b.x && y == b.y;
+    }
+
+    bool operator !=(const Node &b) const {
+      return x != b.x || y != b.y;
+    }
+
+    bool operator <(const Node &b) const {
+      return b.x < x && b.y < y;
     }
   };
 
@@ -24,13 +48,52 @@ namespace PathLibrary {
      * @param a_height Height of the graph (Y Axis)
      * @param a_data 2D Data set that contains the data of the graph
      */
-    Graph(int a_width, int a_height, const unsigned char* a_data);
-    ~Graph() {};
+    Graph(int a_width, int a_height, const unsigned char* a_data);    
 
-    int get_path(Node a_source, Node a_target);
+    /**
+     * Draw the graph as ascii characters
+     */
+    void draw();
+    
+    /**
+     * Calculates the shortest path between source and target destinations using A* search
+     * @param a_source Source Node to start search from
+     * @param a_target Target Node to find path to
+     * @param oOutBuffer Will contain the path steps from the source to the target (Related to the original map)
+     * @param nOutBufferSize Size of the OutBuffer
+     * @return The size of the path if found, else -1 if no path is available
+     */
+    int get_path(Node a_source, Node a_target, int* pOutBuffer, const int nOutBufferSize);    
 
   private:
-    std::vector<Node> get_edges(int a_x, int a_y) const;
+    /**
+     * Get the neighbours of the given nodes (Only considers the cardinal neighbours)     
+     *  .N.  Basically it will only get the neighbour above, below and to the left and
+     *  W*E  right. 
+     *  .S.
+     * If a neighbour is not available it will not be included as a neighbour.
+     */
+    std::vector<Node> get_neighbours(Node a_node) const;
+
+    /**
+     * Retrieve the node from the map for the given coordinates
+     */
+    Node get_node(int x, int y) const;
+
+    /**
+     * Retrieve the map position for the given node
+     */
+    int get_map_position(Node node) const;
+
+    /**
+     * Heuristic will be calculated as the unsquared distance between the given nodes
+     */
+    int calculate_heuristic(Node a_source, Node a_target);
+
+    /**
+    * Calculate the cost between the current node and the target node
+    */
+    int cost(Node a_source, Node a_target);
 
     int width_, height_;
     const unsigned char* nodes_;
