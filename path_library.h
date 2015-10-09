@@ -1,15 +1,14 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
-#include <unordered_map>
 
 namespace PathLibrary {
   struct Node {
-    int x, y, value;
+    int x, y;
+    char value;
 
     Node() = default;
 
-    Node(int a_x, int a_y, int a_value) {
+    Node(int a_x, int a_y, char a_value) {
       x = a_x;
       y = a_y;
       value = a_value;

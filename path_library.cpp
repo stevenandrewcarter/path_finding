@@ -58,7 +58,7 @@ namespace PathLibrary {
   void Graph::draw() {
     for (auto y = 0; y < height_; ++y) {
       for (auto x = 0; x < width_; ++x) {
-        cout << (get_node(x, y).value == 1 ? "." : "#");
+        cout << (get_node(x, y).value == '1' ? "." : "#");
       }
       cout << endl;
     }
@@ -108,13 +108,14 @@ namespace PathLibrary {
         if (current != a_source) solution_path.push_back(current);
       }
       reverse(solution_path.begin(), solution_path.end());
-      // Just in case the buffer cannot actually hold the path positions
+      // Just in case the buffer cannot actually hold the path positions.
+      // NB: Even if a path is found the result will indicate no path is found if the size of the path is larger than the output buffer size.
       if (nOutBufferSize >= solution_path.size()) {
         for (auto path_position = 0; path_position < solution_path.size(); ++path_position) {
           pOutBuffer[path_position] = get_map_position(solution_path[path_position]);
         }
-      }
-      return int(solution_path.size());
+        return int(solution_path.size());
+      }            
     }
     // No Path was found
     return -1;
@@ -126,20 +127,21 @@ namespace PathLibrary {
     vector<Node> neighbours;
     if (a_node.value != '0') {
       // Passible location, check the cardinal neighbours
-      if (a_node.x - 1 > 0 && get_node(a_node.x - 1, a_node.y).value != 0) 
+      if (a_node.x - 1 > 0 && get_node(a_node.x - 1, a_node.y).value != '0') 
         neighbours.push_back(get_node(a_node.x - 1, a_node.y));
-      if (a_node.x + 1 < width_ && get_node(a_node.x + 1, a_node.y).value != 0) 
+      if (a_node.x + 1 < width_ && get_node(a_node.x + 1, a_node.y).value != '0') 
         neighbours.push_back(get_node(a_node.x + 1, a_node.y));
-      if (a_node.y - 1 > 0 && get_node(a_node.x, a_node.y - 1).value != 0) 
+      if (a_node.y - 1 > 0 && get_node(a_node.x, a_node.y - 1).value != '0') 
         neighbours.push_back(get_node(a_node.x, a_node.y - 1));
-      if (a_node.y + 1 < height_ && get_node(a_node.x, a_node.y + 1).value != 0) 
+      if (a_node.y + 1 < height_ && get_node(a_node.x, a_node.y + 1).value != '0') 
         neighbours.push_back(get_node(a_node.x, a_node.y + 1));
     }
     return neighbours;
   }
 
   Node Graph::get_node(int x, int y) const {
-    return Node{ x, y, int(nodes_[width_ * y + x]) };
+    auto node = Node{ x, y, char(nodes_[width_ * y + x]) };
+    return node;
   }
 
   int Graph::get_map_position(Node node) const {
